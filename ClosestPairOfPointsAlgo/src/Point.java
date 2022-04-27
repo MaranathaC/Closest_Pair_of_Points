@@ -1,8 +1,9 @@
 import java.util.Scanner;
 
 public class Point {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
+    private int index;
 
     public Point(Scanner sc) {
         x = sc.nextDouble();
@@ -15,6 +16,12 @@ public class Point {
 
     public double getY() {
         return y;
+    }
+
+    public double getIndex() { return index; }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public void print() {
