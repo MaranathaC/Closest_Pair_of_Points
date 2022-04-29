@@ -24,8 +24,4 @@ public class Point {
         this.index = index;
     }
 
-    public void print() {
-        System.out.println("[" + x + "," + y + "]");
-    }
-
 }
