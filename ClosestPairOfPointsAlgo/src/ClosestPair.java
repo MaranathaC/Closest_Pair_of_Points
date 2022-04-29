@@ -3,9 +3,20 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * Class to represent Closest Pair of Points Algorithm
+ * Points are stored in an array sorted by X coordinates
+ * Functionality includes finding the closest pair of points
+ * @Author Natha Chiu
+ */
 public class ClosestPair {
     private Point[] sortedX;
 
+    /**
+     * constructor
+     * pre: none
+     * post: points are initialized and sorted; store in sortedX array
+     */
     public ClosestPair() {
         Scanner sc;
         try {
@@ -31,13 +42,24 @@ public class ClosestPair {
         }
     }
 
+    /**
+     * findPair
+     * pre: sortedX is initialized
+     * post: return the closest pair of points
+     */
     public Point[] findPair() {
+        // create a new array of points, and sort them by y coordinates
         Point[] sortedY = new Point[sortedX.length];
         System.arraycopy(sortedX, 0, sortedY, 0, sortedX.length);
         Arrays.sort(sortedY, new SortPointsByY());
         return findPair(sortedX, sortedY, 0, sortedX.length);
     }
 
+    /**
+     * findPair
+     * pre: sortedX and sortedY are initialized; left and right indices are provided
+     * post: return the closest pair of points
+     */
     private Point[] findPair(Point[] sortedX, Point[] sortedY, int left, int right) {
         int numOfPoints = right - left;
 
@@ -72,8 +94,9 @@ public class ClosestPair {
             }
         }
 
-        Point[] leftPair = findPair(sortedX, sortedYLeft, left, mid); // find closest pair in left
-        Point[] rightPair = findPair(sortedX, sortedYRight, mid, right); // find closest pair in right
+        // find closest pair in left and right halves
+        Point[] leftPair = findPair(sortedX, sortedYLeft, left, mid);
+        Point[] rightPair = findPair(sortedX, sortedYRight, mid, right);
 
         // find minimum distance
         double deltaLeft = distance(leftPair[0], leftPair[1]);
@@ -84,15 +107,18 @@ public class ClosestPair {
         double leftStripBound = sortedX[mid].getX() - deltaMin;
         double rightStripBound = sortedX[mid].getX() + deltaMin;
 
+        // strip covers all points; therefore, closest distance is found
+        if(sortedX[left].getX() > leftStripBound && sortedX[right - 1].getX() < rightStripBound) {
+            Point[] closest = deltaLeft < deltaRight ? leftPair : rightPair;
+            printPointsAndDistance(closest, left, right - 1);
+            return closest;
+        }
+
         int leftStripIndex = left, rightStripIndex = right - 1; // indices of strip
 
         // find point with smallest x value within the strip
-        while(leftStripIndex < right && sortedX[leftStripIndex].getX() < leftStripBound) {
+        while(sortedX[leftStripIndex].getX() < leftStripBound) {
             leftStripIndex++;
-        }
-
-        if(leftStripIndex >= right) { // no points within the strip
-            return deltaLeft < deltaRight ? leftPair : rightPair;
         }
 
         // find point with largest x value within the strip
@@ -109,13 +135,18 @@ public class ClosestPair {
             }
         }
 
-        Point[] midPair = stripClosest(strip); // find the closest pair within the strip
+        Point[] midPair = stripClosestWithinRect(strip, deltaMin); // find the closest pair within the strip
 
         Point[] closest = minOfThreePairs(leftPair, midPair, rightPair); // return the closest pair
         printPointsAndDistance(closest, left, right - 1);
         return closest;
     }
 
+    /**
+     * distance
+     * pre: points have been allocated memory
+     * post: return distance between 2 points
+     */
     private double distance(Point p1, Point p2) {
         // sqrt((x1-x2)^2 + (y1-y2)^2)
         double diffX = Math.pow(p1.getX() - p2.getX(), 2);
@@ -123,6 +154,11 @@ public class ClosestPair {
         return Math.sqrt(diffX + diffY);
     }
 
+    /**
+     * threePointsMin
+     * pre: points have been allocated memory
+     * post: return the closest pair of points within 3 points
+     */
     private Point[] threePointsMin(Point p1, Point p2, Point p3) {
         Point[] pts = new Point[2];
         double d1 = distance(p1, p2);
@@ -143,12 +179,20 @@ public class ClosestPair {
         return pts;
     }
 
-    private Point[] stripClosest(Point[] strip) {
+    /**
+     * stripClosestWithinRect
+     * pre: points in strip have been allocated memory
+     * post: return the closest pair of points if found within rectangle
+     */
+    private Point[] stripClosestWithinRect(Point[] strip, double delta) {
         Point[] closestInStrip = new Point[2];
         double currShortestDistance = Double.MAX_VALUE;
         for(int i = 0; i < strip.length - 1; i++) {
-            for(int j = i + 1; j < strip.length && j < i + 8; j++) {
+            for(int j = i + 1; j < strip.length && j < i + 8; j++) { // max 7 iteration
+                if(strip[j].getY() - strip[i].getY() >= delta)
+                    break; // Can't get a value lower than delta with this point
                 double distance = distance(strip[i], strip[j]);
+                // update closest pair of points and distance
                 if(distance < currShortestDistance) {
                     closestInStrip[0] = strip[i];
                     closestInStrip[1] = strip[j];
@@ -159,9 +203,16 @@ public class ClosestPair {
         return closestInStrip;
     }
 
+    /**
+     * minOfThreePairs
+     * pre: left and right pairs of points have been allocated memory
+     * post: return closest pair within 3 pairs
+     */
     private Point[] minOfThreePairs(Point[] leftPair, Point[] midPair, Point[] rightPair) {
         double lDist = distance(leftPair[0], leftPair[1]);
-        double mDist = distance(midPair[0], midPair[1]);
+        double mDist = Double.MAX_VALUE; // if a closest pair within a strip is not found
+        if(midPair[0] != null) // update distance if a pair is found
+            mDist = distance(midPair[0], midPair[1]);
         double rDist = distance(rightPair[0], rightPair[1]);
 
         if(lDist < mDist && lDist < rDist) {
@@ -173,6 +224,11 @@ public class ClosestPair {
         }
     }
 
+    /**
+     * printPointsAndDistance
+     * pre: Points have been allocated memory
+     * post: print indices and distance to console: "D[L, R]: 00.0000"
+     */
     private void printPointsAndDistance(Point[] pts, int left, int right) {
         System.out.print("D[" + left + "," + right + "]: ");
         System.out.printf("%.4f\n",distance(pts[0], pts[1]));
