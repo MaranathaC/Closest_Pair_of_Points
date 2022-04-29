@@ -1,6 +1,6 @@
 /**
  * Driver Class for ClosestPair
- * @Author Natha Chiu
+ * @author Natha Chiu
  */
 public class ClosestPairDriver {
     /**

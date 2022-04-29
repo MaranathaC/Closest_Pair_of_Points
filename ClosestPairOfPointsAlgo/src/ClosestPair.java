@@ -7,7 +7,7 @@ import java.util.Scanner;
  * Class to represent Closest Pair of Points Algorithm
  * Points are stored in an array sorted by X coordinates
  * Functionality includes finding the closest pair of points
- * @Author Natha Chiu
+ * @author Natha Chiu
  */
 public class ClosestPair {
     private Point[] sortedX;
