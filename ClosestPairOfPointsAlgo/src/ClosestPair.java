@@ -51,7 +51,7 @@ public class ClosestPair {
         }
 
         // find closest pair within the 3 points
-        if(sortedX.length == 3) {
+        if(numOfPoints == 3) {
             Point[] pts = threePointsMin(sortedX[left], sortedX[left + 1], sortedX[left + 2]);
             printPointsAndDistance(pts, left, right - 1);
             return pts;
