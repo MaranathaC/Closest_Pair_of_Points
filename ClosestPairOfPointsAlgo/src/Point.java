@@ -6,7 +6,6 @@ import java.util.Scanner;
  * Index represents its position in an array of points
  * @author Natha Chiu
  */
-
 public class Point {
     private final double x;
     private final double y;

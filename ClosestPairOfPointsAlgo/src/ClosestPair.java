@@ -43,6 +43,32 @@ public class ClosestPair {
     }
 
     /**
+     * bruteForce
+     * pre: sortedX is initialized
+     * post return the closest pair of points in O(n^2) time
+     */
+    public Point[] bruteForce() {
+        double min = Double.MAX_VALUE;
+        double currMin;
+        int ii = 0, jj = 0;
+        Point[] pts = new Point[2];
+        for(int i = 0; i < sortedX.length; i++) {
+            for(int j = i + 1; j < sortedX.length; j++) {
+                currMin = distance(sortedX[i], sortedX[j]);
+                if(currMin < min) {
+                    min = currMin;
+                    pts[0] = sortedX[i];
+                    pts[1] = sortedX[j];
+                    ii = i;
+                    jj = j;
+                }
+            }
+        }
+        printPointsAndDistance(pts, ii, jj);
+        return pts;
+    }
+
+    /**
      * findPair
      * pre: sortedX is initialized
      * post: return the closest pair of points
@@ -61,6 +87,9 @@ public class ClosestPair {
      * post: return the closest pair of points
      */
     private Point[] findPair(Point[] sortedX, Point[] sortedY, int left, int right) {
+        if(left == 248 || right == 252) {
+            int stop = 1;
+        }
         int numOfPoints = right - left;
 
         // is the closest pair because there is only 2 points
@@ -107,23 +136,23 @@ public class ClosestPair {
         double leftStripBound = sortedX[mid].getX() - deltaMin;
         double rightStripBound = sortedX[mid].getX() + deltaMin;
 
-        // strip covers all points; therefore, closest distance is found
-        if(sortedX[left].getX() > leftStripBound && sortedX[right - 1].getX() < rightStripBound) {
-            Point[] closest = deltaLeft < deltaRight ? leftPair : rightPair;
-            printPointsAndDistance(closest, left, right - 1);
-            return closest;
-        }
-
         int leftStripIndex = left, rightStripIndex = right - 1; // indices of strip
 
         // find point with smallest x value within the strip
-        while(sortedX[leftStripIndex].getX() < leftStripBound) {
+        while(sortedX[leftStripIndex].getX() < leftStripBound && leftStripIndex < right) {
             leftStripIndex++;
         }
 
         // find point with largest x value within the strip
-        while(sortedX[rightStripIndex].getX() > rightStripBound) {
+        while(sortedX[rightStripIndex].getX() > rightStripBound && rightStripIndex > left) {
             rightStripIndex--;
+        }
+
+        // one or no points within the strip
+        if(leftStripIndex >= rightStripIndex) {
+            Point[] closest = deltaLeft < deltaRight ? leftPair : rightPair;
+            printPointsAndDistance(closest, left, right - 1);
+            return closest;
         }
 
         Point[] strip = new Point[rightStripIndex - leftStripIndex + 1];
