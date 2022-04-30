@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Random;
+import static org.junit.Assert.*;
 /**
  * Driver Class for ClosestPair
  * @author Natha Chiu
@@ -11,10 +12,14 @@ public class ClosestPairDriver {
      * post: find closest pair of points
      */
     public static void main(String[] args) {
-        genData();
-        ClosestPair closestPair = new ClosestPair();
-        Point[] points = closestPair.findPair();
-        Point[] points1 = closestPair.bruteForce();
+        for(int i = 0; i < 100; i++) {
+            genData();
+            ClosestPair closestPair = new ClosestPair();
+            Point[] points = closestPair.findPair();
+            Point[] points1 = closestPair.bruteForce();
+            System.out.println();
+            assertEquals(distance(points), distance(points1), 0.0001);
+        }
     }
 
     /**
@@ -41,5 +46,12 @@ public class ClosestPairDriver {
         } catch (IOException e) {
             System.out.println(e);
         }
+    }
+
+    private static double distance(Point[] pts) {
+        // sqrt((x1-x2)^2 + (y1-y2)^2)
+        double diffX = Math.pow(pts[0].getX() - pts[1].getX(), 2);
+        double diffY = Math.pow(pts[0].getY() - pts[1].getY(), 2);
+        return Math.sqrt(diffX + diffY);
     }
 }
