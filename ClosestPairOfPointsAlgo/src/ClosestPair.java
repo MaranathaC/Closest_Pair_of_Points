@@ -87,9 +87,6 @@ public class ClosestPair {
      * post: return the closest pair of points
      */
     private Point[] findPair(Point[] sortedX, Point[] sortedY, int left, int right) {
-        if(left == 248 || right == 252) {
-            int stop = 1;
-        }
         int numOfPoints = right - left;
 
         // is the closest pair because there is only 2 points
